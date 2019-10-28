@@ -65,7 +65,7 @@ for k=1:length(txt_files)
     x2(x2 < 1) = 1;
     y1(y1 < 1) = 1;
     y2(y2 < 1) = 1;
-    for i = 1:NofFrames
+    parfor i = 1:NofFrames
         z = i;
         [performanceA(i), performanceB(i), x1(i), x2(i), y1(i), y2(i)] = processFrame(measurement_rate, x1(i), x2(i), y1(i), y2(i), z, ...
                             png_files{i}, performanceA(i), performanceB(i), path1, path2, param);
