@@ -641,7 +641,7 @@ function [y_w,watermark_inf, smean] =transmitter(img, mask,param)
     omega=temp1(1:m);  % Pick up m measurements randomnly
     
     
-    p1=m-M./3;
+    p1=round(m-M./3);
     
     
     rng(seed2)

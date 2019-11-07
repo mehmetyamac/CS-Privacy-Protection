@@ -243,7 +243,7 @@ function [solImage] = userB_new(y_w, smean,param, v, coor)
     end
 
 
-    %convert information into bits
+    %convert the estimated information into bits
     w_hat=zeros(size(www_hat));        
     w_hat(www_hat>0)=1;
     w_hat(www_hat<0)=0;
