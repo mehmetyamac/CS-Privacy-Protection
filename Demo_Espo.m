@@ -1,11 +1,15 @@
 %Demo Espo
 clear all;close all;
+cam = webcam('Integrated Camera')
+cam.Resolution = '640x480';
+img = imrotate(snapshot(cam), 180);
 %%sparse image
-img=(double((imread('./youtube/Abdullah_1.jpg'))));
+%img=(double((imread('./youtube/Abdullah_1.jpg'))));
 param.type='rgb'
 [S1_init,S2_init,S3_init]=size(img)
-param.N=2^16;
+param.N=2^18;
 img2=imresize(img,sqrt((param.N)/(S1_init*S2_init))); %burda bir yanlislik var
+img2 = img2(1:end-1,1:end-1, :);
 param.em_power=0.12; % 0.085
 
 param.seed1=10;
@@ -83,7 +87,7 @@ for i=1:length(xi)
     mask(floor(yi(i)),floor(xi(i)))=1;
 end
 
-inside=bwfill(mask,'holes');  %fill the inside of mask with all 1s
+inside=bwfill(boundarymask(mask), 'holes');  %fill the inside of mask with all 1s
 
 figure,imshow(inside,'InitialMagnification','fit')
 outside = (inside-1).*(-1);
@@ -110,7 +114,7 @@ for i = 1:length(b)
     end
 end
 
-inside2=bwfill(mask2,'holes');
+inside2=imfill(mask2,26, 'holes');
 
 if ~isequal(inside,inside2)
     disp('something wrong in mask operator')
@@ -139,7 +143,7 @@ if length(ww)<15000 %maximum leghts of the bits we can embed
     param.M = 15003;
 elseif length(ww)>15000 && length(ww)<21000
     param.M = 21003;
-    param.mratio=0.7;
+    param.mratio=0.71;
 else 
     param.M = 24003;
     param.mratio=0.75;
@@ -291,24 +295,25 @@ end
 %             s_hat=reshape(s_hat_h,S1,S2);
 %                  s_hat=s_hat + smean(i);
 %                  sol(:,:,i) = s_hat;
+mm = m + 30 - mod(m, 30);
+tt=factor(mm);
+ss2=tt(1)*tt(end);
+ss1=prod(tt(2:end-1));
 
-tt=factor(m);
-ss1=tt(1)*tt(end);
-ss2=prod(tt(2:end-1));
-
-Encoded_Image=uint8(cat(3, reshape(y1,ss1,ss2),...,
-    reshape(y2,ss1,ss2), reshape(y3,ss1,ss2)));
-figure,subplot(1,3,1);
-imshow(Encoded_Image,[],'InitialMagnification','fit');
+Encoded_Image=uint8(cat(3, reshape([y1; zeros(30-mod(m, 30), 1)],ss1,ss2),...,
+    reshape([y2; zeros(30-mod(m, 30), 1)],ss1,ss2), reshape([y3; zeros(30-mod(m, 30), 1)],ss1,ss2)));
+figure,subplot(1,3,1)
+imshow(Encoded_Image,[]), ylabel('Encrypted and Compressed Signal');
 drawnow; 
 solImageA = userA(y_w, smean,param);
-subplot(1,3,2)  
-imshow(solImageA,[],'InitialMagnification','fit');
+subplot(1,3,2)
+imshow(solImageA,[]), title("User-A, Semi - Authorization");
 drawnow;   
 solImageB= userB(y_w,watermark_inf, smean,param);
-subplot(1,3,3) 
-imshow(solImageB,[],'InitialMagnification','fit');
+subplot(1,3,3)
+imshow(solImageB,[]), title("User-B, Full - Authorization");
 drawnow;
+sgtitle("Reversible Privacy Preservation using Multi-level Encryption and Compressive Sensing")
  function v =check_watermark(bw,in,www)
  %check watermark
         bw_in=DHT(bw,in);
@@ -387,7 +392,7 @@ end
 
 
 sol=zeros(S1,S2,3);
-for i=1:loop
+parfor i=1:loop
     
 
 %%%% decoding part  %%%%%%%%
@@ -583,7 +588,7 @@ omega2=temp2(1:p1);
     
     sol=zeros(S1,S2,3);
 
-for i =1:loop
+parfor i =1:loop
     newy2=y_w((i-1)*m+1:i*m) -At_DHT(www_hat(:,i),in,m);
     [~,x_debias3,~,~,~,~]= ...
                 GPSR_BB(newy2,A_D,tau,...
