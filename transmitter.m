@@ -22,8 +22,15 @@ function [y_w,watermark_inf, smean] = transmitter(img, mask, param, i)
     watermark_inf.D = D;
 
     % Create watermark for cordinates.
-    w_c = double(dec2bin([param.x1; param.x2; param.y1; param.y2;255])) - 48;
-    w_c(5,:) = [];
+    if isempty(param.x1) % If privacy sensitive part is a region
+        temp = double(dec2bin(param.b{1}(:,1),9))-48;
+        temp2 = double(dec2bin(param.b{1}(:,2),9))-48;
+        temp3 = double(dec2bin(size(temp,1),9))-48;
+        w_c = [temp3'; temp(:); temp2(:)];
+    else % If face coors
+        w_c = double(dec2bin([param.x1; param.x2; param.y1; param.y2;255])) - 48;
+        w_c(5,:) = [];
+    end
     w_c(w_c == 0) = -1;
     % Create watermark for mask.
     d = D(:);

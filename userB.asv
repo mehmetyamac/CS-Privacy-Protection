@@ -133,8 +133,10 @@ function [solImage, infor, fail] = userB(y_w,watermark_inf, smean,param)
         infor.total_error = sum(sum(D ~= watermark_inf.D));
         
         %%% Zero-out the unused bits
-        aa = round((masklength*9*2+10+length(idx)-1)/3);
-        www_hat((aa+1):end, :) = 0; % Zero-out the unused bits.
+  
+        
+        aa = (masklength*9*2+10+length(idx)+1)/3;
+        www_hat((aa+1):end,:) = 0; % Zero-out the unused bits.
 
     else
         % Recover face locations. this is for benchmarking over YouTube dataset.
