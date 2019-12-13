@@ -65,12 +65,12 @@ for k=1:length(txt_files)
     y1(y1 < 1) = 1;
     y2(y2 < 1) = 1;
     
-    parfor i = 1:NofFrames % Allocate structs for the performance evaluations for User-A and User-B.
+    for i = 1:NofFrames % Allocate structs for the performance evaluations for User-A and User-B.
         performanceA(i) = struct('PSNR', zeros(1), 'PSNR_insidemask', zeros(1), 'ssimVal', zeros(1), 'PSNR_outsidemask', zeros(1));
         performanceB(i) = struct('PSNR', zeros(1), 'err', zeros(1), 'PSNR_insidemask', zeros(1), 'ssimVal', zeros(1), 'PSNR_outsidemask', zeros(1), 'fail', zeros(1), 'big', zeros(1));
     end
     
-    for i = 1:NofFrames % Process frames
+    parfor i = 1:NofFrames % Process frames
         z = i;
         [performanceA(i), performanceB(i)] = processFrame(measurement_rate, x1(i), x2(i), y1(i), y2(i), z, ...
                             png_files{i}, performanceA(i), performanceB(i), path1, path2, param);
